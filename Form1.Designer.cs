@@ -42,6 +42,7 @@ namespace ImgCmp
             this.btn_hex_compare = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.btn_image_gap = new System.Windows.Forms.Button();
+            this.btn_image_overlap = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
@@ -163,11 +164,22 @@ namespace ImgCmp
             this.btn_image_gap.UseVisualStyleBackColor = true;
             this.btn_image_gap.Click += new System.EventHandler(this.btn_image_gap_Click);
             // 
+            // btn_image_overlap
+            // 
+            this.btn_image_overlap.Location = new System.Drawing.Point(29, 312);
+            this.btn_image_overlap.Name = "btn_image_overlap";
+            this.btn_image_overlap.Size = new System.Drawing.Size(115, 23);
+            this.btn_image_overlap.TabIndex = 14;
+            this.btn_image_overlap.Text = "Image overlap";
+            this.btn_image_overlap.UseVisualStyleBackColor = true;
+            this.btn_image_overlap.Click += new System.EventHandler(this.btn_image_overlap_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1462, 555);
+            this.Controls.Add(this.btn_image_overlap);
             this.Controls.Add(this.btn_image_gap);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.btn_hex_compare);
@@ -205,6 +217,7 @@ namespace ImgCmp
         private System.Windows.Forms.Button btn_hex_compare;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button btn_image_gap;
+        private System.Windows.Forms.Button btn_image_overlap;
     }
 }
 

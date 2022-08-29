@@ -33,8 +33,12 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Aurigma.GraphicsMill, Version=10.6.29.0, Culture=neutral, PublicKeyToken=f4bbbf243f314012, processorArchitecture=AMD64">
+      <HintPath>packages\Aurigma.GraphicsMill.Core.x64.10.6.29\lib\net40\Aurigma.GraphicsMill.dll</HintPath>
+    </Reference>
     <Reference Include="DiffMatchPatch, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\DiffMatchPatch.1.0.3\lib\netstandard2.0\DiffMatchPatch.dll</HintPath>
     </Reference>
@@ -118,6 +122,7 @@
       <DependentUpon>Form2.cs</DependentUpon>
     </Compile>
     <Compile Include="Analyzers\IBitmapAnalyzer.cs" />
+    <Compile Include="ImageBlender.cs" />
     <Compile Include="Labelers\BasicLabeler.cs" />
     <Compile Include="Labelers\ConnectedComponentLabeler.cs" />
     <Compile Include="Labelers\IDifferenceLabeler.cs" />

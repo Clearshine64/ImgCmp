@@ -1,4 +1,5 @@
-﻿using GroupDocs.Comparison;
+﻿using Aurigma;
+using GroupDocs.Comparison;
 using GroupDocs.Comparison.Options;
 using ImageMagick;
 using MetadataExtractor;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
@@ -220,7 +222,26 @@ namespace ImgCmp
             img1.Dispose();
             img2.Dispose();
         }
-        
+
+        private void btn_image_overlap_Click(object sender, EventArgs e)
+        {
+            Image img1 = (Bitmap)Image.FromFile(@"1.jpg");
+            Image img2 = (Bitmap)Image.FromFile(@"2.jpg");
+
+            KVImage.ImageBlender ib = new KVImage.ImageBlender();
+            Bitmap bmp = new Bitmap(img1, img1.Width, img1.Height);
+
+            int nOp = (int)Enum.GetValues(typeof(KVImage.ImageBlender.BlendOperation)).GetValue(3);
+
+            ib.BlendImages(bmp, 0, 0, bmp.Width, bmp.Height, img2, 0, 0, (KVImage.ImageBlender.BlendOperation)nOp);
+
+            pictureBox3.Image = new Bitmap(bmp);
+
+            bmp.Dispose();
+            img1.Dispose();
+            img2.Dispose();
+        }
+
         private Bitmap CreateImageWithBoundingBoxes(Bitmap secondImage, IEnumerable<Rectangle> boundingBoxes)
         {
             var differenceBitmap = secondImage.Clone() as Bitmap;
