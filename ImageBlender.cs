@@ -144,7 +144,7 @@ namespace KVImage
 			srcX, srcY - starting position of the source image 	  
 		*/
 		public void BlendImages(Image destImage, int destX, int destY, int destWidth, int destHeight, 
-								Image srcImage, int srcX, int srcY, BlendOperation BlendOp)
+								Image srcImage, int srcX, int srcY, int dragX, int dragY, BlendOperation BlendOp)
 		{
 			if( destImage == null )
 				throw new Exception("Destination image must be provided");
@@ -155,8 +155,8 @@ namespace KVImage
 			if( srcImage == null )
 				throw new Exception("Source image must be provided");
 
-			if( srcImage.Width < srcX + destWidth || srcImage.Height< srcY + destHeight )
-				throw new Exception("Source image is smaller than requested dimentions");
+			//if( srcImage.Width < srcX + destWidth || srcImage.Height< srcY + destHeight )
+				//throw new Exception("Source image is smaller than requested dimentions");
 
 			Bitmap tempBmp = null;
 			Graphics gr = Graphics.FromImage(destImage);
@@ -171,92 +171,92 @@ namespace KVImage
 
 				case BlendOperation.ROP_MergePaint:
 					tempBmp = PerChannelProcess(ref destImage, destX, destY, destWidth, destHeight, 
-								ref srcImage, srcX, srcY, new PerChannelProcessDelegate(MergePaint));
+								ref srcImage, srcX, srcY, dragX, dragY, new PerChannelProcessDelegate(MergePaint));
 					break;
 
 				case BlendOperation.ROP_NOTSourceErase:
 					tempBmp = PerChannelProcess(ref destImage, destX, destY, destWidth, destHeight, 
-						ref srcImage, srcX, srcY, new PerChannelProcessDelegate(NOTSourceErase));
+						ref srcImage, srcX, srcY, dragX, dragY, new PerChannelProcessDelegate(NOTSourceErase));
 					break;
 
 				case BlendOperation.ROP_SourceAND:
 					tempBmp = PerChannelProcess(ref destImage, destX, destY, destWidth, destHeight, 
-						ref srcImage, srcX, srcY, new PerChannelProcessDelegate(SourceAND));
+						ref srcImage, srcX, srcY, dragX, dragY, new PerChannelProcessDelegate(SourceAND));
 					break;
 
 				case BlendOperation.ROP_SourceErase:
 					tempBmp = PerChannelProcess(ref destImage, destX, destY, destWidth, destHeight, 
-						ref srcImage, srcX, srcY, new PerChannelProcessDelegate(SourceErase));
+						ref srcImage, srcX, srcY, dragX, dragY, new PerChannelProcessDelegate(SourceErase));
 					break;
 
 				case BlendOperation.ROP_SourceInvert:
 					tempBmp = PerChannelProcess(ref destImage, destX, destY, destWidth, destHeight, 
-						ref srcImage, srcX, srcY, new PerChannelProcessDelegate(SourceInvert));
+						ref srcImage, srcX, srcY, dragX, dragY, new PerChannelProcessDelegate(SourceInvert));
 					break;
 
 				case BlendOperation.ROP_SourcePaint:
 					tempBmp = PerChannelProcess(ref destImage, destX, destY, destWidth, destHeight, 
-						ref srcImage, srcX, srcY, new PerChannelProcessDelegate(SourcePaint));
+						ref srcImage, srcX, srcY, dragX, dragY, new PerChannelProcessDelegate(SourcePaint));
 					break;
 
 				case BlendOperation.Blend_Darken:
 					tempBmp = PerChannelProcess(ref destImage, destX, destY, destWidth, destHeight, 
-						ref srcImage, srcX, srcY, new PerChannelProcessDelegate(BlendDarken));
+						ref srcImage, srcX, srcY, dragX, dragY, new PerChannelProcessDelegate(BlendDarken));
 					break;
 
 				case BlendOperation.Blend_Multiply:
 					tempBmp = PerChannelProcess(ref destImage, destX, destY, destWidth, destHeight, 
-						ref srcImage, srcX, srcY, new PerChannelProcessDelegate(BlendMultiply));
+						ref srcImage, srcX, srcY, dragX, dragY, new PerChannelProcessDelegate(BlendMultiply));
 					break;
 
 				case BlendOperation.Blend_Screen:
 					tempBmp = PerChannelProcess(ref destImage, destX, destY, destWidth, destHeight, 
-						ref srcImage, srcX, srcY, new PerChannelProcessDelegate(BlendScreen));
+						ref srcImage, srcX, srcY, dragX, dragY, new PerChannelProcessDelegate(BlendScreen));
 					break;
 
 				case BlendOperation.Blend_Lighten:
 					tempBmp = PerChannelProcess(ref destImage, destX, destY, destWidth, destHeight, 
-						ref srcImage, srcX, srcY, new PerChannelProcessDelegate(BlendLighten));
+						ref srcImage, srcX, srcY, dragX, dragY, new PerChannelProcessDelegate(BlendLighten));
 					break;
 
 				case BlendOperation.Blend_HardLight:
 					tempBmp = PerChannelProcess(ref destImage, destX, destY, destWidth, destHeight, 
-						ref srcImage, srcX, srcY, new PerChannelProcessDelegate(BlendHardLight));
+						ref srcImage, srcX, srcY, dragX, dragY, new PerChannelProcessDelegate(BlendHardLight));
 					break;
 
 				case BlendOperation.Blend_Difference:
 					tempBmp = PerChannelProcess(ref destImage, destX, destY, destWidth, destHeight, 
-						ref srcImage, srcX, srcY, new PerChannelProcessDelegate(BlendDifference));
+						ref srcImage, srcX, srcY, dragX, dragY, new PerChannelProcessDelegate(BlendDifference));
 					break;
 
 				case BlendOperation.Blend_PinLight:
 					tempBmp = PerChannelProcess(ref destImage, destX, destY, destWidth, destHeight, 
-						ref srcImage, srcX, srcY, new PerChannelProcessDelegate(BlendPinLight));
+						ref srcImage, srcX, srcY, dragX, dragY, new PerChannelProcessDelegate(BlendPinLight));
 					break;
 
 				case BlendOperation.Blend_Overlay:
 					tempBmp = PerChannelProcess(ref destImage, destX, destY, destWidth, destHeight, 
-						ref srcImage, srcX, srcY, new PerChannelProcessDelegate(BlendOverlay));
+						ref srcImage, srcX, srcY, dragX, dragY, new PerChannelProcessDelegate(BlendOverlay));
 					break;
 
 				case BlendOperation.Blend_Exclusion:
 					tempBmp = PerChannelProcess(ref destImage, destX, destY, destWidth, destHeight, 
-						ref srcImage, srcX, srcY, new PerChannelProcessDelegate(BlendExclusion));
+						ref srcImage, srcX, srcY, dragX, dragY, new PerChannelProcessDelegate(BlendExclusion));
 					break;
 
 				case BlendOperation.Blend_SoftLight:
 					tempBmp = PerChannelProcess(ref destImage, destX, destY, destWidth, destHeight, 
-						ref srcImage, srcX, srcY, new PerChannelProcessDelegate(BlendSoftLight));
+						ref srcImage, srcX, srcY, dragX, dragY, new PerChannelProcessDelegate(BlendSoftLight));
 					break;
 
 				case BlendOperation.Blend_ColorBurn:
 					tempBmp = PerChannelProcess(ref destImage, destX, destY, destWidth, destHeight, 
-						ref srcImage, srcX, srcY, new PerChannelProcessDelegate(BlendColorBurn));
+						ref srcImage, srcX, srcY, dragX, dragY, new PerChannelProcessDelegate(BlendColorBurn));
 					break;
 
 				case BlendOperation.Blend_ColorDodge:
 					tempBmp = PerChannelProcess(ref destImage, destX, destY, destWidth, destHeight, 
-						ref srcImage, srcX, srcY, new PerChannelProcessDelegate(BlendColorDodge));
+						ref srcImage, srcX, srcY, dragX, dragY, new PerChannelProcessDelegate(BlendColorDodge));
 					break;
 
 				case BlendOperation.Blend_Hue:
@@ -294,36 +294,36 @@ namespace KVImage
 
 		public void BlendImages(Image destImage, Image srcImage, BlendOperation BlendOp)
 		{
-			BlendImages(destImage, 0, 0, destImage.Width, destImage.Height, srcImage, 0, 0, BlendOp);
+			BlendImages(destImage, 0, 0, destImage.Width, destImage.Height, srcImage, 0, 0, 0, 0, BlendOp);
 		}
 
 		public void BlendImages(Image destImage, BlendOperation BlendOp)
 		{
-			BlendImages(destImage, 0, 0, destImage.Width, destImage.Height, null, 0, 0, BlendOp);
+			BlendImages(destImage, 0, 0, destImage.Width, destImage.Height, null, 0, 0, 0, 0, BlendOp);
 		}
 
 		public void BlendImages(Image destImage, int destX, int destY, BlendOperation BlendOp)
 		{
-			BlendImages(destImage, destX, destY, destImage.Width - destX, destImage.Height - destY, null, 0, 0, BlendOp);
+			BlendImages(destImage, destX, destY, destImage.Width - destX, destImage.Height - destY, null, 0, 0, 0, 0, BlendOp);
 		}
 
 		public void BlendImages(Image destImage, int destX, int destY, int destWidth, int destHeight, BlendOperation BlendOp)
 		{
-			BlendImages(destImage, destX, destY, destWidth, destHeight, null, 0, 0, BlendOp);
+			BlendImages(destImage, destX, destY, destWidth, destHeight, null, 0, 0, 0, 0, BlendOp);
 		}
 		#endregion
 			
 		#region Private Blending Functions ...
 
 		private Bitmap PerChannelProcess(ref Image destImg, int destX, int destY, int destWidth, int destHeight, 
-								ref Image srcImg, int srcX, int srcY,
+								ref Image srcImg, int srcX, int srcY, int dragX, int dragY,
 								PerChannelProcessDelegate ChannelProcessFunction)
 		{
 			Bitmap dst = new Bitmap(destImg);
 			Bitmap src = new Bitmap(srcImg);
 
 			BitmapData dstBD = dst.LockBits( new Rectangle(destX, destY, destWidth, destHeight), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
-			BitmapData srcBD = src.LockBits( new Rectangle(srcX, srcY, destWidth, destHeight), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+			BitmapData srcBD = src.LockBits( new Rectangle(srcX, srcY, destWidth-srcX, destHeight-srcY), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
 
 			int dstStride = dstBD.Stride; 
 			int srcStride = srcBD.Stride; 
@@ -340,7 +340,8 @@ namespace KVImage
 				{ 
 					for(int x = 0; x < destWidth * 3; x++) 
 					{
-						pDst[x + y * dstStride] = ChannelProcessFunction(ref pSrc[x + y * srcStride], ref pDst[x + y * dstStride]);
+						if(x >= dragX * 3 && y >= dragY)
+						pDst[x + y * dstStride] = ChannelProcessFunction(ref pSrc[(x - dragX * 3) + (y - dragY) * srcStride], ref pDst[x + y * dstStride]);
 					}
 				}
 			}

@@ -33,6 +33,17 @@ namespace ImgCmp
         private BoundingBoxModes BoundingBoxMode { get; set; }
         private int BoundingBoxPadding { get; set; }
 
+        int cropX;
+        int cropY;
+        int cropWidth;
+        int cropHeight;
+        int dragX;
+        int dragY;
+        public Pen cropPen;
+        public DashStyle cropDashStyle = DashStyle.DashDot;
+        Rectangle rect = new Rectangle(0, 0, 0, 0);
+        bool isMouseDown = false;
+
         public Form1()
         {
             InitializeComponent();
@@ -43,6 +54,8 @@ namespace ImgCmp
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox3.SizeMode = PictureBoxSizeMode.StretchImage;
+
+            pictureBox2.AllowDrop = true;
 
             BitmapAnalyzer = BitmapAnalyzerFactory.Create(AnalyzerType, JustNoticeableDifference);
             Labeler = LabelerFactory.Create(LabelerType, DetectionPadding);
@@ -60,6 +73,18 @@ namespace ImgCmp
             BoundingBoxMode = options.BoundingBoxMode;
             AnalyzerType = options.AnalyzerType;
 
+            File.Delete("1.jpg");
+            File.Delete("2.jpg");
+            File.Delete("test.jpg");
+
+            cropPen = new Pen(Color.Black, 1);
+            cropPen.DashStyle = DashStyle.DashDotDot;
+            cropX = 0;
+            cropY = 0;
+            cropWidth = 400;
+            cropHeight = 400;
+            dragX = 0;
+            dragY = 0;
         }
         public void ResizeImage(string inFileName, string outFileName, int width, int height)
         {
@@ -115,6 +140,12 @@ namespace ImgCmp
 
         private void btn_text_compare_Click(object sender, EventArgs e)
         {
+            if (pictureBox1.Image == null || pictureBox2.Image == null)
+            {
+                MessageBox.Show("Please select image first");
+                return;
+            }
+
             Byte[] bytes1 = File.ReadAllBytes(fname1);
             String file1 = Convert.ToBase64String(bytes1);
             Value.rtbstr1 = file1;
@@ -130,6 +161,12 @@ namespace ImgCmp
 
         private void btn_table_compare_Click(object sender, EventArgs e)
         {
+            if (pictureBox1.Image == null || pictureBox2.Image == null)
+            {
+                MessageBox.Show("Please select image first");
+                return;
+            }
+
             var directories1 = ImageMetadataReader.ReadMetadata(fname1);
             var directories2 = ImageMetadataReader.ReadMetadata(fname2);
             string detail1 = "", detail2 = "";
@@ -155,6 +192,12 @@ namespace ImgCmp
 
         private void btn_hex_compare_Click(object sender, EventArgs e)
         {
+            if (pictureBox1.Image == null || pictureBox2.Image == null)
+            {
+                MessageBox.Show("Please select image first");
+                return;
+            }
+
             Byte[] bytes1 = File.ReadAllBytes(fname1);
             string file1 = bytes1.Aggregate(new StringBuilder(), (sb, v) => sb.AppendFormat("{0:X2} ", v)).ToString();
             Value.rtbstr1 = file1;
@@ -169,6 +212,12 @@ namespace ImgCmp
 
         private void btn_image_gap_Click(object sender, EventArgs e)
         {
+            if (pictureBox1.Image == null || pictureBox2.Image == null)
+            {
+                MessageBox.Show("Please select image first");
+                return;
+            }
+
             Bitmap firstImage = new Bitmap("1.jpg");
             Bitmap secondImage = new Bitmap("2.jpg");
 
@@ -186,7 +235,7 @@ namespace ImgCmp
                 pictureBox3.Image = new Bitmap(img);
                 img.Dispose();
             }
-
+            
             firstImage.Dispose();
             secondImage.Dispose();
             differenceBitmap.Dispose();
@@ -204,6 +253,12 @@ namespace ImgCmp
             //}
 
             //pictureBox3.Image = new Bitmap("3.jpg");
+
+            if (pictureBox1.Image == null || pictureBox2.Image == null)
+            {
+                MessageBox.Show("Please select image first");
+                return;
+            }
 
             File.Delete("test.jpg");
 
@@ -225,15 +280,21 @@ namespace ImgCmp
 
         private void btn_image_overlap_Click(object sender, EventArgs e)
         {
-            Image img1 = (Bitmap)Image.FromFile(@"1.jpg");
-            Image img2 = (Bitmap)Image.FromFile(@"2.jpg");
+            if (!File.Exists("1.jpg") || !File.Exists("2.jpg"))
+            {
+                MessageBox.Show("Please select image first");
+                return;
+            }
+
+            Image img1 = (Bitmap)Image.FromFile("1.jpg");
+            Image img2 = (Bitmap)Image.FromFile("2.jpg");
 
             KVImage.ImageBlender ib = new KVImage.ImageBlender();
-            Bitmap bmp = new Bitmap(img1, img1.Width, img1.Height);
+            Bitmap bmp = new Bitmap(img1, pictureBox1.Width, pictureBox1.Height);
 
             int nOp = (int)Enum.GetValues(typeof(KVImage.ImageBlender.BlendOperation)).GetValue(3);
 
-            ib.BlendImages(bmp, 0, 0, bmp.Width, bmp.Height, img2, 0, 0, (KVImage.ImageBlender.BlendOperation)nOp);
+            ib.BlendImages(bmp, 0, 0, bmp.Width, bmp.Height, img2, 0, 0, dragX, dragY, (KVImage.ImageBlender.BlendOperation)nOp);
 
             pictureBox3.Image = new Bitmap(bmp);
 
@@ -241,7 +302,6 @@ namespace ImgCmp
             img1.Dispose();
             img2.Dispose();
         }
-
         private Bitmap CreateImageWithBoundingBoxes(Bitmap secondImage, IEnumerable<Rectangle> boundingBoxes)
         {
             var differenceBitmap = secondImage.Clone() as Bitmap;
@@ -261,6 +321,173 @@ namespace ImgCmp
             }
             return differenceBitmap;
         }
+        
+        private void pictureBox1_Paint()
+        {
+            if (File.Exists("1.jpg"))
+            {
+                Image img1 = (Bitmap)Image.FromFile(@"1.jpg");
+                Bitmap bmp = new Bitmap(img1, img1.Width, img1.Height);
+                pictureBox1.Image = new Bitmap(bmp);
+                bmp.Dispose();
+                img1.Dispose();
+            }
+            else pictureBox1.Image = null;
+        }
 
+        private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
+        {
+            isMouseDown = true;
+            cropX = e.X;
+            cropY = e.Y;
+        }
+
+        private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (isMouseDown == true)
+            {
+                cropHeight = e.Y - cropY;
+                cropWidth = e.X - cropX;
+                pictureBox1_Paint();
+                pictureBox1.CreateGraphics().DrawRectangle(cropPen, cropX, cropY, cropWidth, cropHeight);
+            }
+        }
+
+        private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
+        {
+            isMouseDown = false;
+            pictureBox1.CreateGraphics().DrawRectangle(cropPen, cropX, cropY, cropWidth, cropHeight);
+        }
+        private void pictureBox2_DragDrop(object sender, DragEventArgs e)
+        {
+            PictureBox picbox = (PictureBox)sender;
+            Graphics g = picbox.CreateGraphics();
+            g.DrawImage((Image)e.Data.GetData(DataFormats.Bitmap), new Point(dragX, dragY));
+        }
+        private void pictureBox2_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.Bitmap))
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+            else
+            {
+                e.Effect = DragDropEffects.None;
+            }
+        }
+
+        private void pictureBox2_Paint()
+        {
+            if (File.Exists("2.jpg"))
+            {
+                Image img2 = (Bitmap)Image.FromFile(@"2.jpg");
+                Bitmap bmp = new Bitmap(img2, img2.Width, img2.Height);
+                pictureBox2.Image = new Bitmap(bmp);
+                bmp.Dispose();
+                img2.Dispose();
+            }
+            else pictureBox2.Image = null;
+        }
+
+        private void pictureBox2_MouseDown(object sender, MouseEventArgs e)
+        {
+            isMouseDown = true;
+            cropX = e.X;
+            cropY = e.Y;
+            //pictureBox2.DoDragDrop(pictureBox2.Image, DragDropEffects.Copy | DragDropEffects.Move);
+        }
+
+        private void pictureBox2_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (isMouseDown == true)
+            {
+                cropHeight = e.Y - cropY;
+                cropWidth = e.X - cropX;
+                //pictureBox2.DoDragDrop(pictureBox2.Image, DragDropEffects.Copy | DragDropEffects.Move);
+
+                //pictureBox2_Paint();
+                //pictureBox2.CreateGraphics().DrawRectangle(cropPen, cropX, cropY, cropWidth, cropHeight);
+
+            }
+        }
+
+        private void pictureBox2_MouseUp(object sender, MouseEventArgs e)
+        {
+            isMouseDown = false;
+            dragX = dragX + cropWidth;
+            dragY = dragY + cropHeight;
+            //pictureBox2.CreateGraphics().DrawRectangle(cropPen, cropX, cropY, cropWidth, cropHeight);
+            Image img = (Bitmap)Image.FromFile("2.jpg");
+            //Bitmap OriginalImage = new Bitmap(img, img.Width, img.Height);
+            pictureBox2.Image = null;
+            pictureBox2.BackColor = Color.White;
+            pictureBox2.DoDragDrop(img, DragDropEffects.Copy | DragDropEffects.Move);
+            img.Dispose();
+         }
+        private void btn_crop1_Click(object sender, EventArgs e)
+        {
+            if(pictureBox1.Image == null)
+            {
+                MessageBox.Show("Please select image first");
+            }
+
+            Rectangle rect = new Rectangle(cropX, cropY, cropWidth, cropHeight);
+            
+            //if(File.Exists("1.jpg"))
+                Image img = (Bitmap)Image.FromFile("1.jpg");
+
+            Bitmap OriginalImage = new Bitmap(img, img.Width, img.Height);
+            Bitmap _img = new Bitmap(cropWidth, cropHeight);
+            Graphics g = Graphics.FromImage(_img);
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+            g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+            //set image attributes  
+            g.DrawImage(OriginalImage, 0, 0, rect, GraphicsUnit.Pixel);
+            pictureBox1.Image = _img;
+            img.Dispose();
+            new Bitmap(_img, 400, 400).Save("1.jpg");
+            //_img.Save("1.jpg");
+            
+            cropX = cropY = 0;
+            cropWidth = cropHeight = 400;
+            
+        }
+
+        private void btn_crop2_Click(object sender, EventArgs e)
+        {
+            if (pictureBox2.Image == null)
+            {
+                MessageBox.Show("Please select image first");
+            }
+
+            Rectangle rect = new Rectangle(cropX, cropY, cropWidth, cropHeight);
+
+            //if(File.Exists("1.jpg"))
+            Image img = (Bitmap)Image.FromFile("2.jpg");
+
+            Bitmap OriginalImage = new Bitmap(img, img.Width, img.Height);
+            Bitmap _img = new Bitmap(cropWidth, cropHeight);
+            Graphics g = Graphics.FromImage(_img);
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+            g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+            //set image attributes  
+            g.DrawImage(OriginalImage, 0, 0, rect, GraphicsUnit.Pixel);
+            pictureBox2.Image = _img;
+            img.Dispose();
+            new Bitmap(_img, 400, 400).Save("2.jpg");
+            //_img.Save("1.jpg");
+
+            cropX = cropY = 0;
+            cropWidth = cropHeight = 400;
+        }
+
+        private void pictureBox2_MouseClick(object sender, MouseEventArgs e)
+        {
+            MouseEventArgs me = (MouseEventArgs)e;
+            Point coordinates = me.Location;
+            MessageBox.Show(coordinates.X.ToString());
+        }
     }
 }
